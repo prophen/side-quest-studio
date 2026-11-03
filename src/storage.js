@@ -47,6 +47,10 @@ export function readNotebook(storage) {
 }
 // Caller holds the browser-wide Web Lock during the entire read/modify/write.
 export function savePassage(storage, draft, now = new Date().toISOString()) {
+  if (typeof draft.id !== "string" || !draft.id)
+    throw new Error(
+      "This draft has an invalid identifier. Download its text before starting a new passage.",
+    );
   if (!draft.text.trim()) throw new Error("Add a few words before saving.");
   const data = readNotebook(storage);
   const existing = data.passages.find((p) => p.id === draft.id);

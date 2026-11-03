@@ -347,3 +347,32 @@ test("failed draft update restores older copy with a persistent warning", async 
   await save(page);
   await expect(page.locator("#recovery-note")).toBeHidden();
 });
+
+test("malformed cached draft cannot enter the editor or damage saved passages", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await write(page);
+  await save(page);
+  await page.getByRole("button", { name: "Close writing panel" }).click();
+  const before = await page.evaluate((k) => localStorage.getItem(k), key);
+  await page.evaluate(() =>
+    sessionStorage.setItem(
+      "side-quest-studio.draft.v1",
+      JSON.stringify({
+        id: "",
+        title: "Bad draft",
+        text: "Keep saved work safe",
+        baseRevision: null,
+      }),
+    ),
+  );
+  await page.reload();
+  await expect(page.getByRole("status")).toContainText(
+    "Draft recovery is unavailable",
+  );
+  await expect(page.locator("#editor")).not.toBeVisible();
+  expect(await page.evaluate((k) => localStorage.getItem(k), key)).toBe(before);
+  await page.getByRole("button", { name: "Open your notebook" }).click();
+  await expect(page.locator("#passage-list")).toContainText("My first page");
+});

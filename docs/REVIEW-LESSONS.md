@@ -8,3 +8,5 @@ Qodo completed the review of [PR #1](https://github.com/prophen/side-quest-studi
 Verification: the regression tests load a notebook before injecting corruption/access failure, and cache version A before failing the write of version B and reloading. All 6 storage tests and 13 Chromium tests pass, along with formatting and the production build.
 
 These are implemented fixes, not a claim that Qodo has reviewed the follow-up commit. No finding was manually dismissed or marked implemented.
+
+Follow-up: Qodo automatically attributed both original findings as `implemented` at `313710b`. Its local review also found that an empty recovered draft ID could be written into the notebook, making later reads reject the collection. Recovery now rejects empty IDs and the storage write boundary independently refuses invalid IDs; regression tests preserve the pre-existing collection byte for byte. The local review's missing-artwork finding is unsupported: both PNGs are committed under `public/art/`, and the browser asset-loading test and CI pass. Binary files were excluded from that local review, which explicitly reported incomplete coverage. No manual dismissal was recorded.

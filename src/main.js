@@ -329,6 +329,7 @@ try {
     const recovered = JSON.parse(raw);
     if (
       typeof recovered.id !== "string" ||
+      !recovered.id ||
       typeof recovered.title !== "string" ||
       typeof recovered.text !== "string" ||
       !(

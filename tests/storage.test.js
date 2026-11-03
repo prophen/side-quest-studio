@@ -115,3 +115,17 @@ test("Markdown keeps titles, dates, multiline text and HTML as literal writing",
   assert.match(md, /    # title\n    ```\n    <script>text<\/script>/);
   assert.match(md, /Created:/);
 });
+
+test("invalid draft IDs cannot corrupt an existing collection", () => {
+  const s = memory();
+  savePassage(s, draft());
+  const before = s.getItem();
+  for (const id of ["", null, undefined, 42]) {
+    assert.throws(
+      () => savePassage(s, { ...draft(), id }),
+      /invalid identifier/,
+    );
+    assert.equal(s.getItem(), before);
+  }
+  assert.equal(readNotebook(s).passages.length, 1);
+});
