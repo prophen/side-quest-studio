@@ -432,6 +432,8 @@ dialog::backdrop {
 }
 .page {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   width: min(680px, 100% - 2 * var(--gutter));
   margin: 0 auto;
   padding: clamp(24px, 6vh, 64px) 0 24px;
