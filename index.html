@@ -142,8 +142,13 @@
           rows="10"
           placeholder="It started with…"
           required
-          aria-describedby="draft-state editor-error"
+          aria-describedby="recovery-note draft-state editor-error"
         ></textarea>
+        <p id="recovery-note" class="draft-state" role="status" hidden>
+          Restored a cached draft. It may not include your latest edits if
+          browser storage failed. Check these words against any downloaded copy
+          before saving.
+        </p>
         <p id="draft-state" class="draft-state">Not saved yet.</p>
         <p id="editor-error" role="alert" class="error"></p>
         <div class="editor-actions">

@@ -47,7 +47,7 @@ Unavailable/full storage leaves the editor's text intact. Corrupt or unsupported
 
 The automated suite covers empty input, persistence/restoration, edits and timestamps, repeated saves, export, quota/access failures, corruption, draft reload recovery, simultaneous tabs and stale edits, literal HTML rendering, keyboard dialogs, mobile overflow, and reduced motion. GitHub Actions runs the same check command. Visual checks use local Playwright screenshots; no deployment is configured.
 
-Qodo review is **not yet verified**. No Qodo workflow/configuration was present in the initial repository, and the authenticated GitHub CLI could not list app installations (HTTP 403; a GitHub App-authorized token is required for that endpoint). The PR is prepared for review, but passing local tests does not count as a Qodo review. Check repository access in the [Qodo GitHub installation](https://github.com/marketplace/qodo-merge-pro), completing sign-in/installation if needed. Record a Qodo review lesson only after an actual review has run.
+Qodo completed its review of PR #1 at `d4c071a`, identifying two recommended fixes: stale notebook entries after storage errors and potentially outdated draft recovery. The follow-up replaces stale entries with an error state and labels recovered drafts as cached copies that may lack recent edits. Three browser regression tests cover these cases. See [docs/REVIEW-LESSONS.md](docs/REVIEW-LESSONS.md). Review of the follow-up commit must be verified separately; local test success does not establish a clean Qodo review.
 
 ## Artwork
 

@@ -39,6 +39,12 @@ function refresh() {
     renderNotebook();
     return true;
   } catch (error) {
+    // Remove stale interactive entries even if the notebook is already open.
+    const errorItem = document.createElement("li");
+    errorItem.className = "error";
+    errorItem.setAttribute("role", "alert");
+    errorItem.textContent = error.message;
+    $("passage-list").replaceChildren(errorItem);
     announce(error.message);
     $("backup").textContent = "Download stored data";
     return false;
@@ -117,6 +123,9 @@ function openEditor(passage = null, recovered = null) {
   $("editor-error").textContent = "";
   $("save-copy").hidden = true;
   $("save").textContent = "Save passage";
+  // A failed cache write may leave an older copy behind. Never promise that
+  // recovery includes the latest edits, even when storage works again now.
+  $("recovery-note").hidden = !recovered;
   $("editor").showModal();
   cacheDraft();
   $("passage").focus();
@@ -221,6 +230,7 @@ $("writing-form").addEventListener("submit", async (event) => {
     );
     draft.baseRevision = result.passage.revision;
     baseline = snapshot();
+    $("recovery-note").hidden = true;
     notebook = result.data;
     renderNotebook();
     cacheDraft();
@@ -328,8 +338,6 @@ try {
     )
       throw new Error();
     openEditor(null, recovered);
-    $("draft-state").textContent =
-      "Recovered your unsaved draft. Save it when you’re ready.";
   }
 } catch {
   announce(

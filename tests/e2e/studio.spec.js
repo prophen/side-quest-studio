@@ -262,3 +262,88 @@ test("unavailable draft cache warns without blocking durable saves", async ({
     ),
   ).toBe(1);
 });
+
+for (const failure of ["corrupt", "unavailable"]) {
+  test(`loaded notebook removes stale entries when storage becomes ${failure}`, async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await write(page);
+    await save(page);
+    await page.getByRole("button", { name: "Close writing panel" }).click();
+    await page.getByRole("button", { name: "Open your notebook" }).click();
+    await expect(page.locator("#passage-list button")).toHaveCount(1);
+    // Simulate a storage event while the library is already open.
+    const original = await page.evaluate((k) => localStorage.getItem(k), key);
+    await page.evaluate(
+      ({ k, failure }) => {
+        if (failure === "corrupt") localStorage.setItem(k, "{bad");
+        else
+          Object.defineProperty(window, "localStorage", {
+            configurable: true,
+            get() {
+              throw new DOMException("Denied", "SecurityError");
+            },
+          });
+        window.dispatchEvent(new StorageEvent("storage", { key: k }));
+      },
+      { k: key, failure },
+    );
+    await expect(page.locator("#passage-list button")).toHaveCount(0);
+    await expect(page.locator("#passage-list [role=alert]")).toContainText(
+      failure === "corrupt" ? "could not be read" : "unavailable",
+    );
+    await page.getByRole("button", { name: "Close notebook" }).click();
+    // Opening it again must show the error, not the old editable list.
+    await page.getByRole("button", { name: "Open your notebook" }).click();
+    await expect(page.locator("#passage-list button")).toHaveCount(0);
+    if (failure === "corrupt") {
+      await page.evaluate(
+        ({ k, original }) => {
+          localStorage.setItem(k, original);
+          window.dispatchEvent(new StorageEvent("storage", { key: k }));
+        },
+        { k: key, original },
+      );
+      await expect(page.locator("#passage-list button")).toHaveCount(1);
+      await expect(page.locator("#passage-list [role=alert]")).toHaveCount(0);
+    }
+  });
+}
+
+test("failed draft update restores older copy with a persistent warning", async ({
+  page,
+}) => {
+  const draftKey = "side-quest-studio.draft.v1";
+  await page.goto("/");
+  await write(page, "Version A");
+  await page.evaluate((draftKey) => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (k, v) {
+      if (k === draftKey) throw new DOMException("Full", "QuotaExceededError");
+      return original.call(this, k, v);
+    };
+  }, draftKey);
+  await page.getByLabel("Your passage").fill("Version B");
+  await expect(page.locator("#draft-state")).toContainText(
+    "Draft recovery is unavailable",
+  );
+  await expect(page.getByLabel("Your passage")).toHaveValue("Version B");
+  expect(
+    await page.evaluate(
+      (k) => JSON.parse(sessionStorage.getItem(k)).text,
+      draftKey,
+    ),
+  ).toBe("Version A");
+  page.once("dialog", (d) => d.accept());
+  await page.reload();
+  await expect(page.getByLabel("Your passage")).toHaveValue("Version A");
+  await expect(page.locator("#recovery-note")).toBeVisible();
+  await expect(page.locator("#recovery-note")).toContainText(
+    "may not include your latest edits",
+  );
+  await page.getByLabel("Your passage").fill("Checked and recovered words");
+  await expect(page.locator("#recovery-note")).toBeVisible();
+  await save(page);
+  await expect(page.locator("#recovery-note")).toBeHidden();
+});
