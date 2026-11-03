@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#542b46" />
+    <meta
+      name="description"
+      content="A cozy little studio for your next creative side quest. Start with a few words, keep them in your notebook."
+    />
+    <title>Side Quest Studio</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="masthead">
+      <a class="brand" href="/" aria-label="Side Quest Studio home"
+        ><span class="brand-icon" aria-hidden="true">✦</span> SIDE QUEST
+        <span>STUDIO</span></a
+      ><span class="day-badge"
+        >DAY 01 <span aria-hidden="true">/</span> A LITTLE BEGINNING</span
+      >
+    </header>
+    <main>
+      <section class="intro" aria-labelledby="welcome">
+        <div>
+          <p class="eyebrow">YOUR IDEAS HAVE A HOME HERE</p>
+          <h1 id="welcome">Make a little room<br />for your next big thing.</h1>
+        </div>
+        <p>
+          A few words. A small beginning.<br />Come in, get comfortable, and
+          create<br />something that’s yours.
+        </p>
+      </section>
+      <div class="studio-layout">
+        <section class="studio-card" aria-label="Your creative studio">
+          <div class="room-heading">
+            <span
+              ><span class="live-dot" aria-hidden="true"></span> YOUR
+              STUDIO</span
+            ><span>No rush. No streaks.</span>
+          </div>
+          <div class="room">
+            <img
+              class="room-art"
+              src="/art/studio-room.png"
+              alt="A warm pixel-art studio with a writing desk by a sunlit window, a bookshelf, a computer workbench, and a sleeping orange cat."
+            />
+            <div id="player" class="player">
+              <img
+                src="/art/character-standing.png"
+                alt="Your character, a Black woman with short natural hair, a sage tee, jeans, and cream sneakers."
+              />
+            </div>
+            <button id="desk" class="hotspot desk">
+              <span aria-hidden="true">✎</span> Writing desk
+              <span class="hotspot-hint">Start here</span>
+            </button>
+            <button
+              id="notebook"
+              class="notebook"
+              aria-label="Open notebook"
+              hidden
+            >
+              <span aria-hidden="true">▤</span>
+            </button>
+            <button class="hotspot workbench" aria-disabled="true">
+              App workbench <span class="hotspot-hint">Coming soon</span>
+            </button>
+            <button class="hotspot board" aria-disabled="true">
+              Content board <span class="hotspot-hint">Coming soon</span>
+            </button>
+          </div>
+          <p class="room-caption" id="room-caption">
+            The lamp is on. Your writing desk is ready.
+          </p>
+        </section>
+        <aside class="quest-card" aria-labelledby="quest-title">
+          <p class="eyebrow">YOUR FIRST SIDE QUEST</p>
+          <div class="quest-mark" aria-hidden="true">✎</div>
+          <h2 id="quest-title">Put something<br />on the page.</h2>
+          <p>
+            A thought, a scene, a sentence you don’t want to forget. It all
+            counts.
+          </p>
+          <div class="reward">
+            <span aria-hidden="true">▤</span>
+            <div>
+              <strong>A notebook of your own</strong
+              ><span>Your first save opens a home for all your passages.</span>
+            </div>
+          </div>
+          <button id="start" class="primary">
+            Let’s write <span aria-hidden="true">↗</span></button
+          ><button id="collection" class="text-button" hidden>
+            Open your notebook
+          </button>
+          <p class="gentle-note">Small steps are still steps.</p>
+        </aside>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <section class="storage-note" aria-label="About your writing">
+        <span aria-hidden="true">⌂</span>
+        <p>
+          <strong>Your words stay with you, in this browser.</strong> Saved on
+          this device only, with no account or cross-device sync. Clearing
+          browser data can remove your writing. Download a Markdown backup to
+          keep a copy.
+        </p>
+        <button id="backup" class="secondary">Download writing</button>
+      </section>
+    </main>
+    <footer>
+      <span>SIDE QUEST STUDIO</span
+      ><span>A little progress. A place to call your own.</span>
+    </footer>
+    <dialog id="editor" aria-labelledby="editor-heading">
+      <div class="dialog-top">
+        <p class="eyebrow">AT THE WRITING DESK</p>
+        <button
+          id="close-editor"
+          class="icon-button"
+          aria-label="Close writing panel"
+        >
+          ×
+        </button>
+      </div>
+      <h2 id="editor-heading">Put something on the page.</h2>
+      <p class="dialog-intro">
+        There’s no word count to reach. Just a little space for you.
+      </p>
+      <form id="writing-form">
+        <label for="title">Title <span>(optional)</span></label
+        ><input
+          id="title"
+          name="title"
+          placeholder="Give this little beginning a name"
+          autocomplete="off"
+        /><label for="passage">Your passage</label
+        ><textarea
+          id="passage"
+          name="passage"
+          rows="10"
+          placeholder="It started with…"
+          required
+          aria-describedby="recovery-note draft-state editor-error"
+        ></textarea>
+        <p id="recovery-note" class="draft-state" role="status" hidden>
+          Restored a cached draft. It may not include your latest edits if
+          browser storage failed. Check these words against any downloaded copy
+          before saving.
+        </p>
+        <p id="draft-state" class="draft-state">Not saved yet.</p>
+        <p id="editor-error" role="alert" class="error"></p>
+        <div class="editor-actions">
+          <button id="save" class="primary" type="submit">Save passage</button
+          ><button id="save-copy" class="secondary" type="button" hidden>
+            Save as a new passage</button
+          ><button id="download-draft" class="text-button" type="button">
+            Download draft
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="library" aria-labelledby="library-heading">
+      <div class="dialog-top">
+        <p class="eyebrow">YOUR WORDS, ALL TOGETHER</p>
+        <button
+          id="close-library"
+          class="icon-button"
+          aria-label="Close notebook"
+        >
+          ×
+        </button>
+      </div>
+      <h2 id="library-heading">Your notebook</h2>
+      <p class="dialog-intro">Every little beginning belongs here.</p>
+      <ul id="passage-list"></ul>
+      <button id="new-passage" class="primary">Write a new passage</button>
+    </dialog>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
