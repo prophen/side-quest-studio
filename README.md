@@ -31,6 +31,7 @@ The Playwright suite manages its own Vite server on port 4173. On Linux CI, inst
 - The first successful save unlocks one notebook. Later passages go inside it; reopen and edit any passage.
 - Download the whole collection as readable Markdown. The editor also downloads unsaved drafts.
 - The app workbench and content board are marked coming soon. Free movement, furniture placement, backend/accounts, AI features, deployment, and later milestone decorations are outside Day 1.
+- The studio follows the device clock: daylight (8am–5pm), dusk (5–8pm and 6–8am), and lamplight at night. The same room art is dimmed with CSS filters and a lamp glow, with no extra images. A dark system color scheme keeps it at night. Add `?phase=day`, `?phase=dusk` or `?phase=night` to the URL to preview a phase. The writing page and notebook stay lamp-lit at every hour. Fonts (Spectral, Archivo Narrow) are self-hosted, so no font requests leave the browser.
 - Native keyboard-accessible dialogs, visible focus, labeled controls, status/error announcements, responsive layout, and reduced-motion support.
 
 ## Your writing and storage

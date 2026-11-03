@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 const key = "side-quest-studio.notebook.v1";
 async function write(page, text = "A small beginning.\nA second line.") {
-  await page.getByRole("button", { name: /Let’s write/ }).click();
+  await page.getByRole("button", { name: "Sit at the desk" }).click();
   await expect(
     page.getByRole("dialog", { name: "Put something on the page." }),
   ).toBeVisible();
