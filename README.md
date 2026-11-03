@@ -44,6 +44,12 @@ Saves use browser-wide Web Locks, reload the latest collection inside the lock, 
 
 Unavailable/full storage leaves the editor's text intact. Corrupt or unsupported saved data is never overwritten; **Download stored data** exports the original JSON for recovery. This recovery file can include your private writing: keep it private. Rendering uses text nodes rather than interpreting user text as HTML. Markdown exports use indented literal blocks to preserve arbitrary markup as writing.
 
+## Sharing and icons
+
+The favicon is a 16×16 pixel-art desk lamp (`public/favicon.svg`, also `assets/icon.svg`). `npm run images` renders `public/og-image.jpg` (1200×630 link preview) and `public/apple-touch-icon.png` from the favicon, room art and self-hosted fonts. Rerun it after changing any of those.
+
+Open Graph tags need the public site address. Build with `VITE_SITE_URL=https://your.domain npm run build` (no trailing slash). Without it the tags use relative paths, which some link previews (Facebook, LinkedIn) ignore.
+
 ## Verification and review
 
 The automated suite covers empty input, persistence/restoration, edits and timestamps, repeated saves, export, quota/access failures, corruption, draft reload recovery, simultaneous tabs and stale edits, literal HTML rendering, keyboard dialogs, mobile overflow, and reduced motion. GitHub Actions runs the same check command. Visual checks use local Playwright screenshots; no deployment is configured.
