@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 const key = "side-quest-studio.notebook.v1";
 async function write(page, text = "A small beginning.\nA second line.") {
-  await page.getByRole("button", { name: /Let’s write/ }).click();
+  await page.getByRole("button", { name: "Sit at the desk" }).click();
   await expect(
     page.getByRole("dialog", { name: "Put something on the page." }),
   ).toBeVisible();
@@ -376,3 +376,57 @@ test("malformed cached draft cannot enter the editor or damage saved passages", 
   await page.getByRole("button", { name: "Open your notebook" }).click();
   await expect(page.locator("#passage-list")).toContainText("My first page");
 });
+
+test("quest never covers the room's hotspots or notebook", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await write(page);
+  await save(page);
+  await page.getByRole("button", { name: "Close writing panel" }).click();
+  const sizes = [
+    [920, 600],
+    [1024, 640],
+    [1199, 900],
+    [1200, 860],
+    [1280, 720],
+    [1359, 700],
+    [1360, 640],
+    [1440, 1000],
+    [1920, 1080],
+  ];
+  for (const [width, height] of sizes) {
+    await page.setViewportSize({ width, height });
+    const covered = await page.evaluate(() => {
+      const quest = document.querySelector(".quest").getBoundingClientRect();
+      return ["#desk", "#notebook", ".board", ".workbench"].filter((sel) => {
+        const box = document.querySelector(sel).getBoundingClientRect();
+        return !(
+          box.right <= quest.left ||
+          box.left >= quest.right ||
+          box.bottom <= quest.top ||
+          box.top >= quest.bottom
+        );
+      });
+    });
+    expect(covered, `${width}×${height}`).toEqual([]);
+  }
+});
+
+for (const [width, height] of [
+  [800, 380],
+  [390, 320],
+]) {
+  test(`save controls stay visible in the editor at ${width}×${height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await page.getByRole("button", { name: "Sit at the desk" }).click();
+    await page.getByLabel("Your passage").fill("Line\n".repeat(40));
+    for (const name of ["Save passage", "Download draft"]) {
+      const box = await page.getByRole("button", { name }).boundingBox();
+      expect(box.y + box.height, name).toBeLessThanOrEqual(height);
+    }
+  });
+}

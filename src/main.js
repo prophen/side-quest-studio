@@ -1,3 +1,8 @@
+import "@fontsource/spectral/300.css";
+import "@fontsource/spectral/300-italic.css";
+import "@fontsource/spectral/400.css";
+import "@fontsource/archivo-narrow/500.css";
+import "@fontsource/archivo-narrow/600.css";
 import "./style.css";
 import {
   STORAGE_KEY,
@@ -7,6 +12,7 @@ import {
   toMarkdown,
   Conflict,
 } from "./storage.js";
+import { resolvePhase, PHASE_LABELS } from "./phase.js";
 
 const $ = (id) => document.getElementById(id);
 let notebook = { version: 1, passages: [] };
@@ -55,12 +61,11 @@ function renderNotebook() {
   $("notebook").hidden = !unlocked;
   $("collection").hidden = !unlocked;
   $("backup").textContent = "Download writing";
-  $("start").firstChild.textContent = unlocked
-    ? "Keep writing "
-    : "Let’s write ";
+  $("start").textContent = unlocked ? "Back to the desk" : "Sit at the desk";
   $("quest-title").textContent = unlocked
-    ? "One beginning. So many possibilities."
+    ? "Pick up where you left off."
     : "Put something on the page.";
+  $("reward").hidden = unlocked;
   const list = $("passage-list");
   list.replaceChildren();
   for (const passage of [...notebook.passages].reverse()) {
@@ -118,7 +123,7 @@ function openEditor(passage = null, recovered = null) {
   $("passage").value = draft.text;
   baseline = recovered ? JSON.stringify({ title: "", text: "" }) : snapshot();
   $("editor-heading").textContent = passage
-    ? "A little more room for your words."
+    ? "Back at the desk."
     : "Put something on the page.";
   $("editor-error").textContent = "";
   $("save-copy").hidden = true;
@@ -152,7 +157,7 @@ async function goWrite() {
   walking = true;
   $("desk").disabled = true;
   $("start").disabled = true;
-  $("room-caption").textContent = "Heading over to your writing desk…";
+  $("room-caption").textContent = "Walking to the desk…";
   const player = $("player");
   if (
     !matchMedia("(prefers-reduced-motion: reduce)").matches &&
@@ -193,7 +198,7 @@ async function goWrite() {
   walking = false;
   $("desk").disabled = false;
   $("start").disabled = false;
-  $("room-caption").textContent = "A quiet corner. A fresh page. All yours.";
+  $("room-caption").textContent = "Fresh page.";
   openEditor();
 }
 $("desk").addEventListener("click", goWrite);
@@ -238,11 +243,11 @@ $("writing-form").addEventListener("submit", async (event) => {
     $("save").textContent = "Saved ✓";
     $("draft-state").textContent =
       (result.first
-        ? "✦ First quest complete! Your notebook is now on the desk."
-        : "Saved. Your words have a home.") + draftStorageWarning;
+        ? "First quest done. Your notebook is on the desk now."
+        : "Saved.") + draftStorageWarning;
     announce(
       result.first
-        ? "First quest complete! You unlocked your notebook."
+        ? "First quest done. You unlocked your notebook."
         : "Passage saved in your notebook.",
     );
   } catch (error) {
@@ -345,3 +350,22 @@ try {
     "Draft recovery is unavailable. Saved passages are separate; download new drafts before leaving.",
   );
 }
+
+const darkScheme = matchMedia("(prefers-color-scheme: dark)");
+const phaseOverride = new URLSearchParams(location.search).get("phase");
+function updatePhase() {
+  const date = new Date();
+  const phase = resolvePhase({
+    date,
+    prefersDark: darkScheme.matches,
+    override: phaseOverride,
+  });
+  document.documentElement.dataset.phase = phase;
+  $("clock-time").textContent = date
+    .toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+    .toLowerCase();
+  $("clock-phase").textContent = PHASE_LABELS[phase];
+}
+updatePhase();
+darkScheme.addEventListener("change", updatePhase);
+setInterval(updatePhase, 30_000);

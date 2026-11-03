@@ -31,6 +31,7 @@ The Playwright suite manages its own Vite server on port 4173. On Linux CI, inst
 - The first successful save unlocks one notebook. Later passages go inside it; reopen and edit any passage.
 - Download the whole collection as readable Markdown. The editor also downloads unsaved drafts.
 - The app workbench and content board are marked coming soon. Free movement, furniture placement, backend/accounts, AI features, deployment, and later milestone decorations are outside Day 1.
+- The studio follows the device clock: daylight (8am–5pm), dusk (5–8pm and 6–8am), and lamplight at night. The same room art is dimmed with CSS filters and a lamp glow, with no extra images. A dark system color scheme keeps it at night. Add `?phase=day`, `?phase=dusk` or `?phase=night` to the URL to preview a phase. The writing page and notebook stay lamp-lit at every hour. Fonts (Spectral, Archivo Narrow) are self-hosted, so no font requests leave the browser.
 - Native keyboard-accessible dialogs, visible focus, labeled controls, status/error announcements, responsive layout, and reduced-motion support.
 
 ## Your writing and storage
@@ -42,6 +43,12 @@ Unsaved edits are recovered from per-tab `sessionStorage` on reload when availab
 Saves use browser-wide Web Locks, reload the latest collection inside the lock, and check passage revisions. Independent tab saves merge; stale edits are blocked and can be saved as a new passage to preserve both versions. Web Locks require a compatible browser and a secure context (HTTPS or localhost). Without them, saving is disabled with an explanation and draft download remains available.
 
 Unavailable/full storage leaves the editor's text intact. Corrupt or unsupported saved data is never overwritten; **Download stored data** exports the original JSON for recovery. This recovery file can include your private writing: keep it private. Rendering uses text nodes rather than interpreting user text as HTML. Markdown exports use indented literal blocks to preserve arbitrary markup as writing.
+
+## Sharing and icons
+
+The favicon is a 16×16 pixel-art desk lamp (`public/favicon.svg`, also `assets/icon.svg`). `npm run images` renders `public/og-image.jpg` (1200×630 link preview) and `public/apple-touch-icon.png` from the favicon, room art and self-hosted fonts. Rerun it after changing any of those.
+
+Open Graph tags need the public site address. Build with `VITE_SITE_URL=https://your.domain npm run build` (no trailing slash). Without it the tags use relative paths, which some link previews (Facebook, LinkedIn) ignore.
 
 ## Verification and review
 
