@@ -26,7 +26,7 @@ The Playwright suite manages its own Vite server on port 4173. On Linux CI, inst
 
 ## Day 1
 
-- An independent character follows a short preset path to the writing desk. The artwork is one standing pose with movement feedback, **not** a full walk-cycle sprite sheet. Reduced-motion mode skips movement.
+- An independent character follows a short preset path to the writing desk. An eight-frame sprite walk cycle uses complete poses with bent knees and opposing arm swings, playing two relaxed strides during the journey. Reduced-motion mode skips movement.
 - Write or paste a passage, with an optional title. Only non-whitespace content is required.
 - The first successful save unlocks one notebook. Later passages go inside it; reopen and edit any passage.
 - Download the whole collection as readable Markdown. The editor also downloads unsaved drafts.

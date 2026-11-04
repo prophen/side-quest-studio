@@ -9,6 +9,7 @@
       content="A pixel-art studio for your side quests: write the book, build the app, make the content. Starting at the writing desk."
     />
     <title>Side Quest Studio</title>
+    <link rel="preload" as="image" href="/art/character-walk.png" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
@@ -44,7 +45,9 @@
           alt="A pixel-art studio with a writing desk and lamp by an arched window, a bookshelf, a computer workbench, and a sleeping orange cat."
         />
         <div id="player" class="player">
+          <div class="walk-sheet" aria-hidden="true"></div>
           <img
+            class="standing-pose"
             src="/art/character-standing.png"
             alt="Your character, a Black woman with short natural hair, a sage tee, jeans, and cream sneakers."
           />

@@ -163,36 +163,46 @@ async function goWrite() {
     !matchMedia("(prefers-reduced-motion: reduce)").matches &&
     !player.classList.contains("at-desk")
   ) {
-    // A single standing pose translated along a preset path with gentle step feedback.
-    // This is intentionally not a sprite walk cycle or free pathfinding.
+    // Two relaxed strides, eight whole-body poses per stride.
+    const strideDuration = 800;
+    player.classList.add("is-walking");
     const motion = player.animate(
       [
-        {
-          left: "53%",
-          top: "79%",
-          transform: "translate(-50%, -100%) rotate(0deg)",
-        },
-        {
-          left: "48%",
-          top: "75%",
-          transform: "translate(-50%, -102%) rotate(-2deg)",
-          offset: 0.35,
-        },
-        {
-          left: "44%",
-          top: "70%",
-          transform: "translate(-50%, -100%) rotate(2deg)",
-          offset: 0.65,
-        },
-        {
-          left: "39%",
-          top: "66%",
-          transform: "translate(-50%, -100%) rotate(0deg)",
-        },
+        { left: "53%", top: "79%" },
+        { left: "39%", top: "66%" },
       ],
-      { duration: 1150, easing: "ease-in-out" },
+      { duration: strideDuration * 2, easing: "linear", fill: "forwards" },
     );
-    await motion.finished;
+    const poses = player.querySelector(".walk-sheet").animate(
+      Array.from({ length: 8 }, (_, frame) => ({
+        backgroundPosition: `${(frame % 4) * (100 / 3)}% ${frame < 4 ? 0 : 100}%`,
+        // The first column's head is 32 atlas pixels farther right.
+        transform: `translateX(${frame % 4 === 0 ? 0 : 100 / 12}%)`,
+        offset: frame / 8,
+        easing: "steps(1, end)",
+      })),
+      {
+        duration: strideDuration,
+        iterations: 2,
+        fill: "forwards",
+      },
+    );
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    const finishEarly = () => {
+      if (reducedMotion.matches) motion.finish();
+    };
+    reducedMotion.addEventListener("change", finishEarly);
+    try {
+      await motion.finished;
+    } catch {
+      // If interrupted, settle at the destination and keep the desk usable.
+    } finally {
+      reducedMotion.removeEventListener("change", finishEarly);
+      player.classList.add("at-desk");
+      player.classList.remove("is-walking");
+      motion.cancel();
+      poses.cancel();
+    }
   }
   player.classList.add("at-desk");
   walking = false;
