@@ -194,6 +194,25 @@ textarea:focus-visible {
   left: 39%;
   top: 66%;
 }
+/* Eight complete poses keep knees, hips and shoulders connected. The atlas
+   is four columns by two rows; its cell ratio differs from the idle image. */
+.walk-sheet {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: -6.25%;
+  width: 112.5%;
+  height: 100%;
+  background: url("/art/character-walk.png") 0 0 / 400% 200% no-repeat;
+  image-rendering: pixelated;
+  filter: var(--room-filter);
+}
+.is-walking .standing-pose {
+  visibility: hidden;
+}
+.is-walking .walk-sheet {
+  display: block;
+}
 .hotspot {
   position: absolute;
   z-index: 3;

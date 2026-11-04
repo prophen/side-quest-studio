@@ -430,3 +430,76 @@ for (const [width, height] of [
     }
   });
 }
+
+test("walk cycle advances whole-body poses during travel and settles before writing", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  await page.locator("#desk").click();
+  await expect(page.locator("#start")).toBeDisabled();
+  await expect(page.locator("#editor")).not.toBeVisible();
+  const poses = await page.locator("#player").evaluate((player) => {
+    const animations = player
+      .getAnimations({ subtree: true })
+      .filter((animation) => !(animation instanceof CSSTransition));
+    animations.forEach((animation) => animation.pause());
+    const sample = (time) => {
+      animations.forEach((animation) => (animation.currentTime = time));
+      return {
+        left: player.getBoundingClientRect().left,
+        frame: getComputedStyle(player.querySelector(".walk-sheet"))
+          .backgroundPosition,
+      };
+    };
+    const start = sample(0);
+    const step = sample(140);
+    const frames = Array.from(
+      { length: 8 },
+      (_, i) => sample(i * 100 + 50).frame,
+    );
+    const heldFrame = sample(190).frame;
+    animations.forEach((animation) => animation.play());
+    return { start, step, frames, heldFrame };
+  });
+  expect(poses.step.left).toBeLessThan(poses.start.left);
+  expect(poses.step.frame).not.toBe(poses.start.frame);
+  expect(new Set(poses.frames).size).toBe(8);
+  expect(poses.heldFrame).toBe(poses.step.frame);
+  await expect(page.locator("#editor")).toBeVisible();
+  await expect(page.locator("#player")).toHaveClass("player at-desk");
+  expect(
+    await page
+      .locator("#player")
+      .evaluate(
+        (p) =>
+          p
+            .getAnimations({ subtree: true })
+            .filter((animation) => !(animation instanceof CSSTransition))
+            .length,
+      ),
+  ).toBe(0);
+  await page.getByRole("button", { name: "Close writing panel" }).click();
+  await page.locator("#start").click();
+  await expect(page.locator("#editor")).toBeVisible();
+  await expect(page.locator("#player")).toHaveClass("player at-desk");
+});
+
+test("reduced motion skips the walk cycle", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.locator("#desk").click();
+  await expect(page.getByLabel("Your passage")).toBeFocused();
+  await expect(page.locator("#player")).toHaveClass("player at-desk");
+  expect(
+    await page
+      .locator("#player")
+      .evaluate(
+        (p) =>
+          p
+            .getAnimations({ subtree: true })
+            .filter((animation) => !(animation instanceof CSSTransition))
+            .length,
+      ),
+  ).toBe(0);
+});
