@@ -51,6 +51,7 @@ function refresh() {
     errorItem.setAttribute("role", "alert");
     errorItem.textContent = error.message;
     $("passage-list").replaceChildren(errorItem);
+    $("search-status").textContent = "";
     announce(error.message);
     $("backup").textContent = "Download stored data";
     return false;
@@ -68,7 +69,17 @@ function renderNotebook() {
   $("reward").hidden = unlocked;
   const list = $("passage-list");
   list.replaceChildren();
-  for (const passage of [...notebook.passages].reverse()) {
+  const query = $("passage-search").value.trim().toLowerCase();
+  const matches = [...notebook.passages]
+    .reverse()
+    .filter(
+      (passage) =>
+        passage.title.toLowerCase().includes(query) ||
+        passage.text.toLowerCase().includes(query),
+    );
+  $("search-status").textContent =
+    `${matches.length} ${matches.length === 1 ? "passage" : "passages"} found.`;
+  for (const passage of matches) {
     const item = document.createElement("li");
     const button = document.createElement("button");
     button.className = "passage-item";
@@ -86,9 +97,11 @@ function renderNotebook() {
       openEditor(passage);
     });
   }
-  if (!unlocked) {
+  if (!matches.length) {
     const item = document.createElement("li");
-    item.textContent = "Your first passage will live here.";
+    item.textContent = query
+      ? "No passages found. Try another search."
+      : "Your first passage will live here.";
     list.append(item);
   }
 }
@@ -292,9 +305,12 @@ $("download-draft").addEventListener("click", () => {
   );
 });
 function openLibrary() {
+  $("passage-search").value = "";
   refresh();
   $("library").showModal();
 }
+// Re-read so filtering never restores entries from a failed/stale read.
+$("passage-search").addEventListener("input", refresh);
 $("notebook").addEventListener("click", openLibrary);
 $("collection").addEventListener("click", openLibrary);
 $("close-library").addEventListener("click", () => $("library").close());
