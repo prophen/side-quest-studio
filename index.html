@@ -151,6 +151,16 @@
           ×
         </button>
       </div>
+      <div class="notebook-search">
+        <label for="passage-search">Search passages</label>
+        <input id="passage-search" type="search" aria-controls="passage-list" />
+        <p
+          id="search-status"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        ></p>
+      </div>
       <ul id="passage-list"></ul>
       <button id="new-passage" class="primary">Write a new passage</button>
     </dialog>
