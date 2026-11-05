@@ -68,6 +68,7 @@ test("search matches literal titles and full text, clears in order, and opens th
     ]);
   }
   await search.fill("[star]");
+  await expect(titles(page)).toHaveText(["Far away"]);
   await page.locator("#passage-list button").click();
   await expect(page.getByLabel("Title (optional)")).toHaveValue("Far away");
   await expect(page.getByLabel("Your passage")).toHaveValue(passages[1].text);
@@ -197,3 +198,44 @@ for (const failure of ["corrupt", "unavailable"]) {
     }
   });
 }
+
+test("rapid typing coalesces storage reads while storage errors refresh immediately", async ({
+  page,
+}) => {
+  await openNotebook(page);
+  await page.clock.install({ time: new Date("2026-01-01T00:00:00Z") });
+  await page.clock.pauseAt(new Date("2026-01-01T00:00:01Z"));
+  await page.evaluate((key) => {
+    window.notebookReads = 0;
+    const original = Storage.prototype.getItem;
+    Storage.prototype.getItem = function (k) {
+      if (k === key) window.notebookReads++;
+      return original.call(this, k);
+    };
+  }, key);
+  const search = page.getByLabel("Search passages");
+  for (const query of ["g", "ga", "garden"]) await search.fill(query);
+  await page.clock.runFor(149);
+  expect(await page.evaluate(() => window.notebookReads)).toBe(0);
+  await page.clock.runFor(1);
+  expect(await page.evaluate(() => window.notebookReads)).toBe(1);
+  await expect(titles(page)).toHaveText(["Moon Garden"]);
+
+  await search.fill("moon");
+  await page.evaluate((key) => {
+    localStorage.setItem(key, "{bad");
+    window.dispatchEvent(new StorageEvent("storage", { key }));
+  }, key);
+  await expect(page.locator("#passage-list [role=alert]")).toContainText(
+    "could not be read",
+  );
+  await expect(titles(page)).toHaveCount(0);
+  await page.clock.runFor(150);
+  expect(await page.evaluate(() => window.notebookReads)).toBe(2);
+  await search.fill("garden");
+  await page.clock.runFor(150);
+  await expect(titles(page)).toHaveCount(0);
+  await expect(page.locator("#passage-list [role=alert]")).toContainText(
+    "could not be read",
+  );
+});

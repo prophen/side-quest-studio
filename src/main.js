@@ -20,6 +20,7 @@ let draft = null;
 let baseline = "";
 let saving = false;
 let walking = false;
+let searchTimer;
 let draftStorageWarning = "";
 const snapshot = () =>
   JSON.stringify({ title: $("title").value, text: $("passage").value });
@@ -40,6 +41,7 @@ function download(content, filename, type = "text/markdown;charset=utf-8") {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function refresh() {
+  clearTimeout(searchTimer);
   try {
     notebook = readNotebook(storage);
     renderNotebook();
@@ -309,8 +311,11 @@ function openLibrary() {
   refresh();
   $("library").showModal();
 }
-// Re-read so filtering never restores entries from a failed/stale read.
-$("passage-search").addEventListener("input", refresh);
+// Coalesce typing bursts, then re-read so failed reads cannot revive stale entries.
+$("passage-search").addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(refresh, 150);
+});
 $("notebook").addEventListener("click", openLibrary);
 $("collection").addEventListener("click", openLibrary);
 $("close-library").addEventListener("click", () => $("library").close());
