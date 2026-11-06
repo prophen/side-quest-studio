@@ -4,7 +4,7 @@
 
 - Scheduled trigger: November 5, 2026, 11:00:15 PM PST (November 6, 07:00:15 UTC).
 - Execution observed by 07:00:36 UTC. The scheduled prompt arrived without another manual implementation request.
-- Schedule: `scheduled-task:f9290512-173a-4b12-9792-6453c16918f4`.
+- Schedule: `SCHEDULE_ID`.
 - Disabled successfully before editing; no next run remains.
 - Ticket: [#7](https://github.com/prophen/side-quest-studio/issues/7).
 - Workflow source: [DAY-4-AUTOMATION.md](DAY-4-AUTOMATION.md).
@@ -13,8 +13,8 @@
 
 ## Retry budget
 
-Repair cycles used: **0 of 2** total across failed checks and confirmed review findings.
-No failures or repairs recorded so far. Preserve this counter on review wakeups.
+Repair cycles used: **1 of 2** total across failed checks and confirmed review findings.
+Repair cycle 1 addresses both low-priority Qodo findings. Preserve this counter on review wakeups.
 
 ## Acceptance criteria and checks
 
@@ -30,9 +30,14 @@ Validation: `npm run check` passed on the first run: formatting, 10 unit tests, 
 
 ## PR and review
 
-PR: [#8](https://github.com/prophen/side-quest-studio/pull/8). Qodo review and CI: pending. No reviewed commit or approval claimed.
+PR: [#8](https://github.com/prophen/side-quest-studio/pull/8). All three checks passed on `43b2b258f42a5f6bedbaf4c17582315aa90ce5e2`. [Qodo reviewed that same head](https://github.com/prophen/side-quest-studio/pull/8#issuecomment-6679253661) and reported two low-priority findings, no rule violations, and no requirement gaps.
 
-Checked application/test commit: `0094897e1f43ee5b8fc7e05badf1895c85941146`. This evidence update changes only this document; the application and tests are unchanged.
+- `2b938a1c-f539-430e-918d-d51c0ff18a45`: confirmed workstation path and schedule handle in shared docs. Replaced them with placeholders in both Day 4 documents. Prior commits and review quotes still contain the original values; history was not rewritten. These values are identifiers, not authentication credentials.
+- `632a2057-6679-4422-b95f-91d1ac1f74e0`: confirmed duplicate reset sequence. This is a maintainability concern, not a demonstrated current behavior bug. Extracted resetSearch() for opening and clearing, retaining focus only in the clear handler.
+
+Repair validation passed: `npm run check` (formatting, 10 unit tests, 28 Chromium tests, build), explicit Day 4 document formatting, and `git diff --check`. Repeat review is pending; the request uses `/agentic_review`, verified against https://docs.qodo.ai/code-review/use-qodo-in-prs/code-review.
+
+Checked application/test commit: `0094897e1f43ee5b8fc7e05badf1895c85941146`. That initial implementation passed local checks. The repair changes the shared reset helper and documentation; its checks and review must be tracked separately.
 
 ## Challenge comment draft (in progress)
 
@@ -40,6 +45,6 @@ Checked application/test commit: `0094897e1f43ee5b8fc7e05badf1895c85941146`. Thi
 
 **Ticket and PR (or partial work):** https://github.com/prophen/side-quest-studio/issues/7 — https://github.com/prophen/side-quest-studio/pull/8 (open, not merged).
 
-**What happened, including checks, Qodo review and retries:** The scheduled prompt started the agent, which read project rules and implemented Clear search. Local formatting, 10 unit tests, 28 Chromium tests, and build passed; Qodo pending; 0/2 repair cycles used.
+**What happened, including checks, Qodo review and retries:** The scheduled prompt started the agent, which read project rules and implemented Clear search. Local formatting, 10 unit tests, 28 Chromium tests, and build passed; Qodo reported two low-priority findings; both addressed in repair cycle 1/2, with all local checks passing again and repeat Qodo review pending.
 
 **What still needed me, or where it stopped:** No intervention during implementation. Review is outstanding; merging remains a human decision.
