@@ -30,14 +30,15 @@ Validation: `npm run check` passed on the first run: formatting, 10 unit tests, 
 
 ## PR and review
 
-PR: not opened yet. Qodo review: pending. No reviewed commit or approval claimed.
-The application/test changes will be committed first; their commit identifies the checked code. This note may subsequently be updated separately to record the exact SHA and PR URL.
+PR: [#8](https://github.com/prophen/side-quest-studio/pull/8). Qodo review and CI: pending. No reviewed commit or approval claimed.
+
+Checked application/test commit: `0094897e1f43ee5b8fc7e05badf1895c85941146`. This evidence update changes only this document; the application and tests are unchanged.
 
 ## Challenge comment draft (in progress)
 
-**Trigger and workflow/source link:** T3 scheduled job, restricted to issue #7; disabled itself at startup. Source: this PR's `docs/DAY-4-AUTOMATION.md`.
+**Trigger and workflow/source link:** T3 scheduled job, restricted to issue #7; disabled itself at startup. Source: https://github.com/prophen/side-quest-studio/blob/feat/clear-notebook-search/docs/DAY-4-AUTOMATION.md.
 
-**Ticket and PR (or partial work):** https://github.com/prophen/side-quest-studio/issues/7 — implementation and regression tests written; PR pending.
+**Ticket and PR (or partial work):** https://github.com/prophen/side-quest-studio/issues/7 — https://github.com/prophen/side-quest-studio/pull/8 (open, not merged).
 
 **What happened, including checks, Qodo review and retries:** The scheduled prompt started the agent, which read project rules and implemented Clear search. Local formatting, 10 unit tests, 28 Chromium tests, and build passed; Qodo pending; 0/2 repair cycles used.
 
