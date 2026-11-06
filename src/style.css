@@ -563,10 +563,17 @@ textarea::placeholder {
 .notebook-search {
   padding: 12px var(--gutter);
 }
+.search-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
 .notebook-search input {
+  flex: 1 1 140px;
   min-width: 0;
   font-size: 20px;
-  margin-bottom: 12px;
 }
 #search-status {
   margin: 0;

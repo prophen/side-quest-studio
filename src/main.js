@@ -306,9 +306,12 @@ $("download-draft").addEventListener("click", () => {
     "side-quest-draft.md",
   );
 });
-function openLibrary() {
+function resetSearch() {
   $("passage-search").value = "";
   refresh();
+}
+function openLibrary() {
+  resetSearch();
   $("library").showModal();
 }
 // Coalesce typing bursts, then re-read so failed reads cannot revive stale entries.
@@ -317,6 +320,10 @@ $("passage-search").addEventListener("input", () => {
   searchTimer = setTimeout(refresh, 150);
 });
 $("notebook").addEventListener("click", openLibrary);
+$("clear-search").addEventListener("click", () => {
+  resetSearch();
+  $("passage-search").focus();
+});
 $("collection").addEventListener("click", openLibrary);
 $("close-library").addEventListener("click", () => $("library").close());
 $("new-passage").addEventListener("click", () => {
