@@ -29,7 +29,7 @@ The Playwright suite manages its own Vite server on port 4173. On Linux CI, inst
 - An independent character follows a short preset path to the writing desk. An eight-frame sprite walk cycle uses complete poses with bent knees and opposing arm swings, playing two relaxed strides during the journey. Reduced-motion mode skips movement.
 - Write or paste a passage, with an optional title. Only non-whitespace content is required.
 - The first successful save unlocks one notebook. Later passages go inside it; reopen and edit any passage.
-- Search your notebook by title or full passage text. Search ignores capitalization, resets when the notebook opens, and leaves full-collection backups unchanged.
+- Search your notebook by title or full passage text. Search ignores capitalization, resets when the notebook opens, and leaves full-collection backups unchanged. Use Clear search to immediately return to the full notebook and focus the search field.
 - Download the whole collection as readable Markdown. The editor also downloads unsaved drafts.
 - The app workbench and content board are marked coming soon. Free movement, furniture placement, backend/accounts, AI features, deployment, and later milestone decorations are outside Day 1.
 - The studio follows the device clock: daylight (8am–5pm), dusk (5–8pm and 6–8am), and lamplight at night. The same room art is dimmed with CSS filters and a lamp glow, with no extra images. A dark system color scheme keeps it at night. Add `?phase=day`, `?phase=dusk` or `?phase=night` to the URL to preview a phase. The writing page and notebook stay lamp-lit at every hour. Fonts (Spectral, Archivo Narrow) are self-hosted, so no font requests leave the browser.

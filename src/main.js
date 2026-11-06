@@ -317,6 +317,11 @@ $("passage-search").addEventListener("input", () => {
   searchTimer = setTimeout(refresh, 150);
 });
 $("notebook").addEventListener("click", openLibrary);
+$("clear-search").addEventListener("click", () => {
+  $("passage-search").value = "";
+  refresh();
+  $("passage-search").focus();
+});
 $("collection").addEventListener("click", openLibrary);
 $("close-library").addEventListener("click", () => $("library").close());
 $("new-passage").addEventListener("click", () => {

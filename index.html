@@ -153,7 +153,16 @@
       </div>
       <div class="notebook-search">
         <label for="passage-search">Search passages</label>
-        <input id="passage-search" type="search" aria-controls="passage-list" />
+        <div class="search-controls">
+          <input
+            id="passage-search"
+            type="search"
+            aria-controls="passage-list"
+          />
+          <button id="clear-search" type="button" class="secondary">
+            Clear search
+          </button>
+        </div>
         <p
           id="search-status"
           role="status"

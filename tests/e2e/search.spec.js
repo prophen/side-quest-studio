@@ -125,6 +125,29 @@ test("search supports keyboard focus, live counts and narrow layouts", async ({
   expect(box.x).toBeGreaterThanOrEqual(0);
   expect(box.x + box.width).toBeLessThanOrEqual(320);
   await page.keyboard.press("Tab");
+  const clear = page.getByRole("button", { name: "Clear search", exact: true });
+  await expect(clear).toBeFocused();
+  expect(
+    await clear.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return (
+        el.matches(":focus-visible") &&
+        style.outlineStyle !== "none" &&
+        parseFloat(style.outlineWidth) > 0
+      );
+    }),
+  ).toBe(true);
+  const clearBox = await clear.boundingBox();
+  expect(clearBox.x).toBeGreaterThanOrEqual(0);
+  expect(clearBox.x + clearBox.width).toBeLessThanOrEqual(320);
+  await page.keyboard.press("Enter");
+  await expect(search).toBeFocused();
+  await expect(search).toHaveValue("");
+  await expect(page.locator("#search-status")).toHaveText("3 passages found.");
+  await search.fill("garden");
+  await expect(titles(page)).toHaveText(["Moon Garden"]);
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
   await expect(page.locator("#passage-list button")).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.getByLabel("Your passage")).toHaveValue(passages[0].text);
@@ -137,6 +160,8 @@ test("search leaves stored writing and full Markdown backups intact", async ({
   const original = await page.evaluate((key) => localStorage.getItem(key), key);
   await page.getByLabel("Search passages").fill("garden");
   await expect(titles(page)).toHaveCount(1);
+  await page.getByRole("button", { name: "Clear search", exact: true }).click();
+  await expect(titles(page)).toHaveCount(3);
   await page.getByRole("button", { name: "Close notebook" }).click();
   const pending = page.waitForEvent("download");
   await page
@@ -239,3 +264,69 @@ test("rapid typing coalesces storage reads while storage errors refresh immediat
     "could not be read",
   );
 });
+
+for (const failure of [null, "corrupt", "unavailable"]) {
+  test(`clear search refreshes immediately and cancels pending work (${failure ?? "healthy storage"})`, async ({
+    page,
+  }) => {
+    await openNotebook(page);
+    const search = page.getByLabel("Search passages");
+    await search.fill("garden");
+    await expect(titles(page)).toHaveText(["Moon Garden"]);
+    await page.clock.install({ time: new Date("2026-01-01T00:00:00Z") });
+    await page.clock.pauseAt(new Date("2026-01-01T00:00:01Z"));
+    const original = await page.evaluate(
+      (key) => localStorage.getItem(key),
+      key,
+    );
+    await page.evaluate(
+      ({ key, failure }) => {
+        window.notebookReads = 0;
+        const getItem = Storage.prototype.getItem;
+        Storage.prototype.getItem = function (k) {
+          if (k === key) {
+            window.notebookReads++;
+            if (failure === "unavailable")
+              throw new DOMException("Denied", "SecurityError");
+          }
+          return getItem.call(this, k);
+        };
+        // No storage event: the Clear action itself must discover the failure.
+        if (failure === "corrupt") localStorage.setItem(key, "{bad");
+      },
+      { key, failure },
+    );
+    await search.fill("moon");
+    await page
+      .getByRole("button", { name: "Clear search", exact: true })
+      .click();
+    await expect(search).toHaveValue("");
+    await expect(search).toBeFocused();
+    expect(await page.evaluate(() => window.notebookReads)).toBe(1);
+    if (failure) {
+      await expect(titles(page)).toHaveCount(0);
+      await expect(page.locator("#passage-list [role=alert]")).toContainText(
+        failure === "corrupt" ? "could not be read" : "unavailable",
+      );
+      await expect(page.locator("#search-status")).toBeEmpty();
+    } else {
+      await expect(titles(page)).toHaveText([
+        "Untitled passage",
+        "Far away",
+        "Moon Garden",
+      ]);
+      await expect(page.locator("#search-status")).toHaveText(
+        "3 passages found.",
+      );
+    }
+    await page.clock.runFor(500);
+    expect(await page.evaluate(() => window.notebookReads)).toBe(1);
+    if (failure) await expect(titles(page)).toHaveCount(0);
+    else await expect(titles(page)).toHaveCount(3);
+    if (failure !== "unavailable") {
+      expect(await page.evaluate((key) => localStorage.getItem(key), key)).toBe(
+        failure === "corrupt" ? "{bad" : original,
+      );
+    }
+  });
+}
