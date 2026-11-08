@@ -116,3 +116,20 @@ writing in fixtures; use generated artwork and synthetic test passages.
 
 **Why:** People should be able to write freely without their words becoming code,
 unexpected network traffic, or public repository content.
+
+### 6. Shared docs describe the workflow, not the workstation
+
+**Applies to:** committed files in `docs/`, `README.md`, `AGENTS.md`, and saved
+agent or scheduled-job prompts.
+
+Write absolute local paths, home-directory usernames, and runtime handles such as
+schedule, project, thread, or session IDs as placeholders (`PROJECT_ROOT`,
+`SCHEDULE_ID`). Keep the real values in uncommitted local configuration. Public
+GitHub links, commit SHAs, Qodo finding IDs, and repository-relative paths are
+fine. If a value was already committed, replace it in the current files and say
+that history still contains it; do not rewrite history unless the user asks.
+
+**Why:** Qodo's PR #8 review (finding `2b938a1c-f539-430e-918d-d51c0ff18a45`)
+caught the Day 4 automation notes exposing the workstation path and schedule
+handle. The values stay in history after removal, and notes with placeholders
+can be reused by anyone running the workflow.

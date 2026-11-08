@@ -5,8 +5,8 @@
 The user asked to start building the agreed Day 1 plan, create a public GitHub repository, and create a T3 project. They then explicitly requested handing the work to a new thread in that project. Continue implementation there without asking to start again.
 
 - Public repository created: https://github.com/prophen/side-quest-studio
-- T3 project: Side Quest Studio, ID `210d74b1-c54a-4d16-9166-a279ecca15c2`
-- Local checkout: `/Users/nikema/.t3/projects/side-quest-studio`
+- T3 project: Side Quest Studio, ID `T3_PROJECT_ID`
+- Local checkout: `PROJECT_ROOT`
 - Branch already checked out: `feat/day-one-writing-quest`
 - Remote main contains only T3's initial README/icon commit. No app code, dependencies, PR, or tests yet.
 - Artwork and this handoff are currently uncommitted on the feature branch. Preserve them.
