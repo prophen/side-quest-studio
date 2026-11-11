@@ -283,35 +283,6 @@ textarea:focus-visible {
   max-width: 560px;
   padding: 8px 0 0;
 }
-/* The quest overlays the room's empty lower-left corner only when the room
-   is large enough (or far enough right) to keep the desk and notebook clear.
-   Otherwise it stacks below. Covered by the "quest never covers" e2e test. */
-@media (min-width: 1200px) and (min-height: 860px), (min-width: 1360px) {
-  .room {
-    margin-right: 0;
-  }
-  .quest {
-    position: absolute;
-    left: var(--gutter);
-    bottom: clamp(16px, 4vh, 40px);
-    z-index: 4;
-    max-width: 380px;
-    padding: 20px 22px 22px 0;
-  }
-  /* Pools the page color behind the text where it sits over the art. */
-  .quest::before {
-    content: "";
-    position: absolute;
-    inset: -60px -90px -50px calc(-1 * var(--gutter));
-    z-index: -1;
-    background: radial-gradient(
-      ellipse at 30% 55%,
-      color-mix(in srgb, var(--bg) 94%, transparent) 45%,
-      transparent 75%
-    );
-    pointer-events: none;
-  }
-}
 .room-caption {
   margin: 0 0 10px;
   color: var(--amber);
@@ -697,5 +668,89 @@ textarea::placeholder {
     scroll-behavior: auto !important;
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* Each station keeps its own quest; stacking keeps room controls clear. */
+.quests {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  padding-bottom: 24px;
+}
+.quests .quest {
+  position: relative;
+  inset: auto;
+  max-width: 560px;
+}
+.quests .quest::before {
+  display: none;
+}
+.quest h2 {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(32px, 3.1vw, 46px);
+  line-height: 1.06;
+  color: var(--paper-strong);
+  margin: 0 0 14px;
+}
+.player.at-workbench {
+  left: 67%;
+  top: 72%;
+}
+.walk-facing {
+  position: absolute;
+  inset: 0;
+}
+.facing-right .walk-facing {
+  transform: scaleX(-1);
+}
+.logbook {
+  left: 72%;
+  top: 46%;
+}
+.logbook > span {
+  background: var(--amber);
+  color: var(--night);
+}
+#log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+#log-list > li:not(:has(button)) {
+  padding: 20px var(--gutter);
+}
+#log-backup {
+  margin: 0 var(--gutter) 24px;
+}
+.log-page {
+  min-height: 0;
+  padding-top: 16px;
+  padding-bottom: 0;
+}
+.log-fields {
+  overflow-y: auto;
+  flex: 1;
+  padding: 10px;
+  margin: -10px;
+}
+.log-fields textarea {
+  min-height: 100px;
+  margin-bottom: 20px;
+}
+.log-fields #log-next {
+  min-height: 70px;
+}
+.log-page .page-foot {
+  flex-shrink: 0;
+  margin-top: 12px;
+}
+@media (max-width: 760px) {
+  .quests {
+    grid-template-columns: 1fr;
+    gap: 32px;
   }
 }

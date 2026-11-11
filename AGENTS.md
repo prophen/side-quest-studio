@@ -9,13 +9,14 @@ with Vite, vanilla JavaScript, and CSS. The working writing quest lets someone w
 to a desk, save a passage, unlock one notebook, edit their collection, and download
 Markdown backups. Writing lives in this browser; there is no backend or account.
 
-The app workbench and content board are coming soon. Free movement, furniture
-placement, accounts, cloud sync, AI features, and deployment are outside the current
+The workbench supports local project logs; the content board is coming soon.
+Free movement, furniture placement, accounts, cloud sync, AI features, and deployment are outside the current
 scope unless the user explicitly requests them. Do not prescribe infrastructure
 for these future features as a requirement for the current app.
 
-`src/main.js` owns interactions and draft recovery; `src/storage.js` owns notebook
-validation, saves, and export; `src/phase.js` owns lighting selection;
+`src/main.js` owns writing interactions, shared walks, and writing draft recovery;
+`src/logbook-ui.js` owns the log panel and its draft recovery; `src/storage.js`
+owns shared collection validation, saves, and export; `src/phase.js` owns lighting selection;
 `src/style.css` and `index.html` own presentation. See `README.md` for current
 behavior and `docs/REVIEW-LESSONS.md` for verified review lessons. The Day 1 handoff
 is historical context, not an up-to-date description of repository state.

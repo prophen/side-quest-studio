@@ -45,7 +45,9 @@
           alt="A pixel-art studio with a writing desk and lamp by an arched window, a bookshelf, a computer workbench, and a sleeping orange cat."
         />
         <div id="player" class="player">
-          <div class="walk-sheet" aria-hidden="true"></div>
+          <div class="walk-facing">
+            <div class="walk-sheet" aria-hidden="true"></div>
+          </div>
           <img
             class="standing-pose"
             src="/art/character-standing.png"
@@ -65,26 +67,52 @@
         <button class="hotspot board" aria-disabled="true">
           Board <span class="hotspot-hint">later</span>
         </button>
-        <button class="hotspot workbench" aria-disabled="true">
-          Workbench <span class="hotspot-hint">later</span>
+        <button id="workbench" class="hotspot workbench">Workbench</button>
+        <button
+          id="logbook"
+          class="notebook logbook"
+          aria-label="Open logbook"
+          hidden
+        >
+          <span aria-hidden="true">▤</span>
         </button>
       </section>
-      <section class="quest" aria-labelledby="quest-title">
-        <p class="room-caption" id="room-caption">The desk is clear.</p>
-        <h1 id="quest-title">Put something on the page.</h1>
-        <p class="quest-body">
-          A thought, a scene, a sentence you don’t want to lose.
-        </p>
-        <p id="reward" class="reward">
-          Your first save puts a notebook on the desk.
-        </p>
-        <div class="quest-actions">
-          <button id="start" class="primary">Sit at the desk</button
-          ><button id="collection" class="text-button" hidden>
-            Open your notebook
-          </button>
-        </div>
-      </section>
+      <div class="quests">
+        <section class="quest" aria-labelledby="quest-title">
+          <p class="room-caption" id="room-caption">The desk is clear.</p>
+          <h1 id="quest-title">Put something on the page.</h1>
+          <p class="quest-body">
+            A thought, a scene, a sentence you don’t want to lose.
+          </p>
+          <p id="reward" class="reward">
+            Your first save puts a notebook on the desk.
+          </p>
+          <div class="quest-actions">
+            <button id="start" class="primary">Sit at the desk</button
+            ><button id="collection" class="text-button" hidden>
+              Open your notebook
+            </button>
+          </div>
+        </section>
+        <section class="quest log-quest" aria-labelledby="log-quest-title">
+          <p class="room-caption" id="log-room-caption">
+            A little progress counts.
+          </p>
+          <h2 id="log-quest-title">Log a bit of progress.</h2>
+          <p class="quest-body">
+            What you tried, what you learned, what comes next.
+          </p>
+          <p id="log-reward" class="reward">
+            Your first save puts a logbook beside the computer.
+          </p>
+          <div class="quest-actions">
+            <button id="log-start" class="primary">Go to the workbench</button
+            ><button id="log-collection" class="text-button">
+              Open your logbook
+            </button>
+          </div>
+        </section>
+      </div>
     </main>
     <p id="status" class="status" role="status" aria-live="polite"></p>
     <footer class="storage-note" aria-label="About your writing">
@@ -172,6 +200,66 @@
       </div>
       <ul id="passage-list"></ul>
       <button id="new-passage" class="primary">Write a new passage</button>
+    </dialog>
+    <dialog id="log-editor" class="sheet" aria-labelledby="log-heading">
+      <div class="sheet-top">
+        <h2 id="log-heading">Log a bit of progress.</h2>
+        <button id="log-close" class="icon-button" aria-label="Close log panel">
+          ×
+        </button>
+      </div>
+      <form id="log-form" class="page log-page">
+        <div class="log-fields">
+          <label for="log-project">Project name (optional)</label
+          ><input id="log-project" autocomplete="off" />
+          <label for="log-text">What I worked on</label
+          ><textarea
+            id="log-text"
+            rows="5"
+            required
+            aria-describedby="log-recovery log-state log-error"
+          ></textarea>
+          <label for="log-next">Next step (optional)</label
+          ><textarea id="log-next" rows="2"></textarea>
+        </div>
+        <div class="page-foot">
+          <p id="log-recovery" class="draft-state" role="status" hidden>
+            Restored a cached draft. It may not include your latest edits if
+            browser storage failed. Check these words against any downloaded
+            copy before saving.
+          </p>
+          <p id="log-state" class="draft-state" role="status">Not saved yet.</p>
+          <p id="log-error" class="error" role="alert"></p>
+          <div class="editor-actions">
+            <button id="log-save" class="primary" type="submit">
+              Save entry</button
+            ><button id="log-copy" class="secondary" type="button" hidden>
+              Save as a new entry</button
+            ><button id="log-draft" class="text-button" type="button">
+              Download log draft
+            </button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="log-library"
+      class="drawer"
+      aria-labelledby="log-library-heading"
+    >
+      <div class="sheet-top">
+        <h2 id="log-library-heading">Your logbook</h2>
+        <button
+          id="log-library-close"
+          class="icon-button"
+          aria-label="Close logbook"
+        >
+          ×
+        </button>
+      </div>
+      <ul id="log-list"></ul>
+      <button id="log-new" class="primary">Log another bit of progress</button
+      ><button id="log-backup" class="secondary">Download logbook</button>
     </dialog>
     <script type="module" src="/src/main.js"></script>
   </body>
