@@ -389,3 +389,76 @@ test("saved entries show newest updates first and saves use the logbook lock", a
   await page.locator("#log-collection").click();
   await expect(page.locator("#log-list strong")).toHaveText(["Older", "Newer"]);
 });
+
+for (const destination of ["workbench", "desk"]) {
+  test(`finishing the ${destination} walk preserves a log draft opened during travel`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.locator(`#${destination}`).click();
+    // Hold travel open while using the independent logbook controls.
+    await page
+      .locator("#player")
+      .evaluate((player) =>
+        player
+          .getAnimations({ subtree: true })
+          .forEach((animation) => animation.pause()),
+      );
+    await page.locator("#log-collection").click();
+    await page.locator("#log-new").click();
+    await page.getByLabel("Project name (optional)").fill("Keep this project");
+    await page.getByLabel("What I worked on").fill("Words typed during travel");
+    await page.getByLabel("Next step (optional)").fill("Keep this next step");
+    await page
+      .locator("#player")
+      .evaluate((player) =>
+        player
+          .getAnimations({ subtree: true })
+          .forEach((animation) => animation.finish()),
+      );
+    await expect(page.locator("#player")).not.toHaveClass(/is-walking/);
+    await expect(page.getByLabel("What I worked on")).toHaveValue(
+      "Words typed during travel",
+    );
+    await expect(page.getByLabel("Project name (optional)")).toHaveValue(
+      "Keep this project",
+    );
+    await expect(page.getByLabel("Next step (optional)")).toHaveValue(
+      "Keep this next step",
+    );
+    await expect(page.locator("dialog[open]")).toHaveCount(1);
+    await expect(page.locator("#editor")).toBeHidden();
+    expect(
+      await page.evaluate(
+        (k) => JSON.parse(sessionStorage.getItem(k)).text,
+        draftKey,
+      ),
+    ).toBe("Words typed during travel");
+    await save(page);
+  });
+}
+
+test("finishing a walk leaves an already-open logbook visible", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.locator("#workbench").click();
+  await page
+    .locator("#player")
+    .evaluate((player) =>
+      player
+        .getAnimations({ subtree: true })
+        .forEach((animation) => animation.pause()),
+    );
+  await page.locator("#log-collection").click();
+  await page
+    .locator("#player")
+    .evaluate((player) =>
+      player
+        .getAnimations({ subtree: true })
+        .forEach((animation) => animation.finish()),
+    );
+  await expect(page.locator("#player")).not.toHaveClass(/is-walking/);
+  await expect(page.locator("#log-library")).toBeVisible();
+  await expect(page.locator("dialog[open]")).toHaveCount(1);
+});

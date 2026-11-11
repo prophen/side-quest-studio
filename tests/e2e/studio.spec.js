@@ -135,9 +135,6 @@ test("simultaneous tabs merge new passages and preserve conflicting edits", asyn
 }) => {
   await page.goto("/");
   const other = await context.newPage();
-  // This test exercises storage concurrency; animation has its own coverage.
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await other.emulateMedia({ reducedMotion: "reduce" });
   await other.goto("/");
   await write(page, "First tab");
   await write(other, "Second tab");

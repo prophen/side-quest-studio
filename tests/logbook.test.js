@@ -9,6 +9,7 @@ import {
   readLogbook,
   parseLogbook,
   logToMarkdown,
+  toMarkdown,
   Conflict,
   StorageProblem,
 } from "../src/storage.js";
@@ -123,4 +124,29 @@ test("read and quota failures preserve caller draft; export quotes every free-te
   assert.match(md, /    <img src=x>/);
   assert.match(md, /    <script>literal/);
   assert.match(md, /    # next/);
+});
+
+test("all Markdown line endings keep log and notebook content indented without changing stored words", () => {
+  const storage = memory();
+  const text = "A\r<script>literal</script>\r\n# heading\n![image](x)";
+  const { entry } = saveLogEntry(storage, {
+    ...draft(),
+    project: text,
+    text,
+    next: text,
+  });
+  const expected =
+    "    A\n    <script>literal</script>\n    # heading\n    ![image](x)";
+  const md = logToMarkdown([entry]);
+  assert.equal(md.split(expected).length - 1, 3);
+  assert.equal(md.includes("\r"), false);
+  assert.equal(readLogbook(storage).entries[0].text, text);
+  const { passage } = savePassage(storage, {
+    id: "literal-writing",
+    title: text,
+    text,
+    baseRevision: null,
+  });
+  assert.equal(toMarkdown([passage]).split(expected).length - 1, 2);
+  assert.equal(readNotebook(storage).passages[0].text, text);
 });

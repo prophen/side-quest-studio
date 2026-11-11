@@ -126,7 +126,7 @@ export function saveLogEntry(storage, draft, now = new Date().toISOString()) {
 // Indented verbatim blocks preserve arbitrary Markdown/HTML as writing.
 export const quote = (value) =>
   value
-    .split(/\r?\n/)
+    .split(/\r\n|\r|\n/)
     .map((line) => `    ${line}`)
     .join("\n");
 export function logToMarkdown(entries) {

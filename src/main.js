@@ -244,7 +244,9 @@ async function goStation(destination, open) {
   $("log-start").disabled = false;
   caption.textContent =
     destination === "desk" ? "Fresh page." : "A little progress counts.";
-  open();
+  // Someone may have opened a collection or started writing during the walk.
+  // Settling the character must never replace their draft or stack dialogs.
+  if (!document.querySelector("dialog[open]")) open();
 }
 const goWrite = () => goStation("desk", openEditor);
 setupLogbook({ $, storage, download, announce, goStation });
