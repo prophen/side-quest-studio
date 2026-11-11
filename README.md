@@ -31,7 +31,7 @@ The Playwright suite manages its own Vite server on port 4173. On Linux CI, inst
 - The first successful save unlocks one notebook. Later passages go inside it; reopen and edit any passage.
 - Search your notebook by title or full passage text. Search ignores capitalization, resets when the notebook opens, and leaves full-collection backups unchanged. Use Clear search to immediately return to the full notebook and focus the search field.
 - Download the whole collection as readable Markdown. The editor also downloads unsaved drafts.
-- The app workbench and content board are marked coming soon. Free movement, furniture placement, backend/accounts, AI features, deployment, and later milestone decorations are outside Day 1.
+- The workbench opens its own “Log a bit of progress” quest. Save what you worked on, with an optional project name and next step, to unlock a logbook beside the computer. Reopen, edit, and download entries from the logbook. Each station keeps its own quest panel below the room, stacking on narrow screens. The content board is marked coming soon. Free movement, furniture placement, backend/accounts, AI features, deployment, and later milestone decorations are outside Day 1.
 - The studio follows the device clock: daylight (8am–5pm), dusk (5–8pm and 6–8am), and lamplight at night. The same room art is dimmed with CSS filters and a lamp glow, with no extra images. A dark system color scheme keeps it at night. Add `?phase=day`, `?phase=dusk` or `?phase=night` to the URL to preview a phase. The writing page and notebook stay lamp-lit at every hour. Fonts (Spectral, Archivo Narrow) are self-hosted, so no font requests leave the browser.
 - Native keyboard-accessible dialogs, visible focus, labeled controls, status/error announcements, responsive layout, and reduced-motion support.
 
@@ -44,6 +44,8 @@ Unsaved edits are recovered from per-tab `sessionStorage` on reload when availab
 Saves use browser-wide Web Locks, reload the latest collection inside the lock, and check passage revisions. Independent tab saves merge; stale edits are blocked and can be saved as a new passage to preserve both versions. Web Locks require a compatible browser and a secure context (HTTPS or localhost). Without them, saving is disabled with an explanation and draft download remains available.
 
 Unavailable/full storage leaves the editor's text intact. Corrupt or unsupported saved data is never overwritten; **Download stored data** exports the original JSON for recovery. This recovery file can include your private writing: keep it private. Rendering uses text nodes rather than interpreting user text as HTML. Markdown exports use indented literal blocks to preserve arbitrary markup as writing.
+
+Log entries use the separate `side-quest-studio.logbook.v1` local-storage key and Web Lock; their per-tab cache uses `side-quest-studio.log-draft.v1`. They have the same storage limits, conflict checks, literal Markdown exports, draft downloads, and raw-data recovery as writing. Open your logbook remains available before unlocking so unreadable stored logs can always be downloaded. When both draft caches exist, the writing draft opens first; closing it opens the cached log draft. A recovered cache carries a warning until successfully saved.
 
 ## Sharing and icons
 

@@ -383,6 +383,11 @@ test("quest never covers the room's hotspots or notebook", async ({ page }) => {
   await write(page);
   await save(page);
   await page.getByRole("button", { name: "Close writing panel" }).click();
+  await page.locator("#workbench").click();
+  await page.getByLabel("What I worked on").fill("A layout check.");
+  await page.locator("#log-save").click();
+  await expect(page.locator("#log-save")).toHaveText("Saved ✓");
+  await page.locator("#log-close").click();
   const sizes = [
     [920, 600],
     [1024, 640],
@@ -398,15 +403,17 @@ test("quest never covers the room's hotspots or notebook", async ({ page }) => {
     await page.setViewportSize({ width, height });
     const covered = await page.evaluate(() => {
       const quest = document.querySelector(".quest").getBoundingClientRect();
-      return ["#desk", "#notebook", ".board", ".workbench"].filter((sel) => {
-        const box = document.querySelector(sel).getBoundingClientRect();
-        return !(
-          box.right <= quest.left ||
-          box.left >= quest.right ||
-          box.bottom <= quest.top ||
-          box.top >= quest.bottom
-        );
-      });
+      return ["#desk", "#notebook", "#logbook", ".board", ".workbench"].filter(
+        (sel) => {
+          const box = document.querySelector(sel).getBoundingClientRect();
+          return !(
+            box.right <= quest.left ||
+            box.left >= quest.right ||
+            box.bottom <= quest.top ||
+            box.top >= quest.bottom
+          );
+        },
+      );
     });
     expect(covered, `${width}×${height}`).toEqual([]);
   }

@@ -12,6 +12,7 @@ import {
   toMarkdown,
   Conflict,
 } from "./storage.js";
+import { setupLogbook } from "./logbook-ui.js";
 import { resolvePhase, PHASE_LABELS } from "./phase.js";
 
 const $ = (id) => document.getElementById(id);
@@ -167,27 +168,41 @@ function closeEditor() {
   draft = null;
   $("editor").close();
 }
-async function goWrite() {
-  if (walking || $("editor").open) return;
+async function goStation(destination, open) {
+  if (walking || $("editor").open || $("log-editor").open) return;
   walking = true;
   $("desk").disabled = true;
   $("start").disabled = true;
-  $("room-caption").textContent = "Walking to the desk…";
+  $("workbench").disabled = true;
+  $("log-start").disabled = true;
+  const caption = $(
+    destination === "desk" ? "room-caption" : "log-room-caption",
+  );
+  caption.textContent = `Walking to the ${destination}…`;
   const player = $("player");
   if (
     !matchMedia("(prefers-reduced-motion: reduce)").matches &&
-    !player.classList.contains("at-desk")
+    !player.classList.contains(`at-${destination}`)
   ) {
     // Two relaxed strides, eight whole-body poses per stride.
     const strideDuration = 800;
-    player.classList.add("is-walking");
-    const motion = player.animate(
-      [
-        { left: "53%", top: "79%" },
-        { left: "39%", top: "66%" },
-      ],
-      { duration: strideDuration * 2, easing: "linear", fill: "forwards" },
+    const room = player.parentElement.getBoundingClientRect();
+    const current = getComputedStyle(player);
+    const from = { left: current.left, top: current.top };
+    const target =
+      destination === "desk"
+        ? { left: "39%", top: "66%" }
+        : { left: "67%", top: "72%" };
+    player.classList.toggle(
+      "facing-right",
+      parseFloat(from.left) < (parseFloat(target.left) * room.width) / 100,
     );
+    player.classList.add("is-walking");
+    const motion = player.animate([from, target], {
+      duration: strideDuration * 2,
+      easing: "linear",
+      fill: "forwards",
+    });
     const poses = player.querySelector(".walk-sheet").animate(
       Array.from({ length: 8 }, (_, frame) => ({
         backgroundPosition: `${(frame % 4) * (100 / 3)}% ${frame < 4 ? 0 : 100}%`,
@@ -213,19 +228,28 @@ async function goWrite() {
       // If interrupted, settle at the destination and keep the desk usable.
     } finally {
       reducedMotion.removeEventListener("change", finishEarly);
-      player.classList.add("at-desk");
+      player.classList.remove("at-desk", "at-workbench", "facing-right");
+      player.classList.add(`at-${destination}`);
       player.classList.remove("is-walking");
       motion.cancel();
       poses.cancel();
     }
   }
-  player.classList.add("at-desk");
+  player.classList.remove("at-desk", "at-workbench");
+  player.classList.add(`at-${destination}`);
   walking = false;
   $("desk").disabled = false;
   $("start").disabled = false;
-  $("room-caption").textContent = "Fresh page.";
-  openEditor();
+  $("workbench").disabled = false;
+  $("log-start").disabled = false;
+  caption.textContent =
+    destination === "desk" ? "Fresh page." : "A little progress counts.";
+  // Someone may have opened a collection or started writing during the walk.
+  // Settling the character must never replace their draft or stack dialogs.
+  if (!document.querySelector("dialog[open]")) open();
 }
+const goWrite = () => goStation("desk", openEditor);
+setupLogbook({ $, storage, download, announce, goStation });
 $("desk").addEventListener("click", goWrite);
 $("start").addEventListener("click", goWrite);
 $("close-editor").addEventListener("click", closeEditor);
